@@ -1,0 +1,59 @@
+{
+  "documents": {
+    "ARCHITECTURE.md": {
+      "sha256": "bac4cb307feb82927956658067039e23d25b74d21ea78ebb9d7b742a18c17f23",
+      "words": 1785
+    },
+    "TRD.md": {
+      "sha256": "577032d064eb1d0e3903a7f2258c7a5a010079651fa3d0ccec3238b72082be22",
+      "words": 8134
+    }
+  },
+  "checks": {
+    "ARCHITECTURE.md": {
+      "final_status": true,
+      "broken_local_links": [],
+      "balanced_fences": true,
+      "template_markers": []
+    },
+    "TRD.md": {
+      "final_status": true,
+      "broken_local_links": [],
+      "balanced_fences": true,
+      "template_markers": []
+    },
+    "upstream_sources_unchanged": {
+      "docs/PRD.md": true,
+      "_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/DESIGN.md": true,
+      "_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/EXPERIENCE.md": true
+    },
+    "AD_IDs": [
+      "AD-1",
+      "AD-2",
+      "AD-3",
+      "AD-4",
+      "AD-5",
+      "AD-6",
+      "AD-7",
+      "AD-8",
+      "AD-9",
+      "AD-10",
+      "AD-11",
+      "AD-12",
+      "AD-13",
+      "AD-14"
+    ],
+    "all_FRs_covered": true,
+    "all_NFRs_covered": true,
+    "all_metrics_covered": true,
+    "snapshot_matches_canonical": true,
+    "spine_lint": {
+      "ok": true,
+      "spine": "ARCHITECTURE-SPINE.md",
+      "total_findings": 0,
+      "by_severity": {},
+      "findings": []
+    }
+  },
+  "scope": "Document integrity and traceability only; no code, hardware, performance or deployment qualification executed"
+}

@@ -1,0 +1,3 @@
+| Pass | Original Text | Revised Text | Changes |
+| --- | --- | --- | --- |
+| prose | PRD §2, “Walkthrough for approval”: “A potential match stops and pauses the robot. Rejection requires Resume and retains Lost status; confirmation saves evidence, sets Found, and ends the session.” | “A potential match stops the robot and pauses the search session. After rejection, the object remains Lost and searching stays paused until Resume. Confirmation saves evidence, sets Found, and ends the session.” | Distinguishes stopped movement from paused session state. Removes the unintended suggestion that Resume is required to reject a match. Preserves the formal, direct voice and all decisions/targets. No additional concrete clarity fix found in the addendum. |
