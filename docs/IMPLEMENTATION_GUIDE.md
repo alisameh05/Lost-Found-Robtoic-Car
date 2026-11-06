@@ -45,7 +45,7 @@ Dependencies are completion gates. Work inside a phase may begin against shared 
 | # | Phase | Depends on | Produces | Status |
 | --- | --- | --- | --- | --- |
 | [00](phases/PHASE-00-project-baseline.md) | Project baseline and execution setup | — | Requirement/evidence index, owners, equipment/deadline questions | Not started |
-| [01](phases/PHASE-01-hardware-readiness.md) | Hardware review and preparation | 00 | Supervisor-reviewed variants, power/wiring/programming plan; T2 clearance | Not started |
+| [01](phases/PHASE-01-hardware-readiness.md) | Hardware review and preparation | 00 | Verified inventory; MCP-assisted pin-to-pin wiring list and custom Fritzing diagram; supervisor-reviewed power/wiring/programming plan; T2 clearance | Not started |
 | [02](phases/PHASE-02-laptop-and-vision-spike.md) | Laptop environment and vision feasibility | 00 | Recorded laptop, compatible candidate environment, offline model spike | Not started |
 | [03](phases/PHASE-03-application-foundation.md) | Application foundation and shared contracts | 02 | Next.js/FastAPI shell, contracts, protected local services, simulator interfaces | Not started |
 | [04](phases/PHASE-04-registration-and-persistence.md) | Registration and persistent records | 03 | SQLite schema, managed media, image/ROI registration and initial history | Not started |
@@ -69,12 +69,27 @@ Phase 09 is the convergence point for persistence, video, firmware, input and ma
 
 Keep the phase IDs and dependency gates below as the source of truth, but execute the work in these blocks so the physical build is ready before the main application work:
 
-1. **Baseline and hardware readiness — Phases 00–01.** Inventory the exact parts, resolve the supervisor-reviewed power/wiring/programming plan (T2), inspect the parts, then assemble and wire only as that cleared plan allows. Leave motor power/output disabled. This completes the physical build/readiness work, not proof that the integrated robot operates safely.
+1. **Baseline and hardware readiness — Phases 00–01.** Inventory and identify the exact parts, use EasyCircuit MCP to look up documented pinouts and check the proposed connection list, and use Fritzing MCP to create custom module parts and a physical-style wiring diagram. Save the connection list, source references, editable Fritzing project and rendered diagram as Phase 01 evidence. Resolve the supervisor-reviewed power/wiring/programming plan (T2), inspect the parts, then assemble and wire only as that cleared plan allows. Leave motor power disconnected and outputs disabled. MCP checks and generated diagrams are supporting artifacts; they do not qualify current capacity, battery safety, or supervisor approval.
 2. **Software and stationary subsystem work — Phases 02–11 and 13.** Build the laptop/application, camera streaming, firmware/command handling, controls, matching, safety, history and usable UI. Phases 05 and 06 include hardware-facing software and bench checks; they still depend on Phase 03 and keep motor movement disabled. Do not delay independent software work while waiting for physical movement tests.
 3. **Controlled robot integration — Phase 12.** After Phases 09–11 pass their gates, bring the assembled robot into the full guarded application. Verify disabled outputs and safe wheel-stop behavior before floor operation. This is the first phase that enables actual movement; it cannot be completed before the software safety path exists.
 4. **Release, route, qualification and handoff — Phases 14–17.** Follow the dependencies in the phase table.
 
 “Finish hardware first” therefore means complete and inspect the physical assembly/wiring before the main software build, with motors isolated. The end-to-end hardware acceptance—camera freshness through the application, serial command expiry, and safe physical movement—requires software and remains gated by Phases 05, 06 and 12. Do not energize or drive early to make the schedule appear complete.
+
+## MCP-assisted hardware wiring
+
+Use the two MCPs for documentation and connection planning, not as substitutes for the T2 electrical review:
+
+| MCP | Phase 01 role | Saved evidence |
+| --- | --- | --- |
+| EasyCircuit MCP | Look up part pinouts/capabilities where the exact part is present in its catalog; run its wiring checks on the proposed design. Treat unverified facts and catalog misses as open review items. | Source-backed pin/connection table and a saved design link, if its catalog supports the components. |
+| Fritzing MCP | Build the editable breadboard/schematic drawing; create clearly labeled custom parts for project modules absent from the library; render the final views for physical reference. | `.fzz` project, custom part definitions, rendered wiring views and the matching connection table. |
+
+**Codex setup status (2026-11-06):** EasyCircuit is configured as the remote `easycircuit` MCP. Fritzing is configured as the local `fritzing` MCP, launched with `uvx` from the public `fedoragobrowse-design/fritzing-mcp` repository; Python 3.13 and `uv` are present. The Fritzing desktop application/runtime is not installed on this machine. Until it is available, basic sketch creation/inspection/checking can work, but the MCP's local parts search, custom-part validation and render tools are unavailable. Install Fritzing and point `FRITZING_APP_ROOT` at its app directory before treating those outputs as available. Do not buy/install a paid build without the user's authorization.
+
+The Phase 01 connection table is the source of truth for the diagram. For every connection, record both endpoint labels, signal/power/ground role, source for the pinout and verification status. Keep unresolved connections visibly marked `BLOCKED`; do not infer a module pinout from a generic image. Separate high-current motor/battery wiring from breadboard signal wiring. Do not use the diagram as permission to charge, energize or move the robot.
+
+Revisit the wiring artifacts in **Phase 05** for the verified ESP32-CAM/programming-base arrangement and camera power, and in **Phase 06** for the Uno/HC-05/motor-driver control harness and reset-disabled outputs. Only carry the reviewed, exact-variant connections into **Phase 12** for guarded movement. Phase 12 is not where the wiring design is first invented.
 
 ## Milestones and scheduling
 
