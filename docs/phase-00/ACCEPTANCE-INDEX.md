@@ -1,6 +1,6 @@
 # Phase 00 — Acceptance and evidence index
 
-- **Index status:** Planned; all results `Pending`
+- **Index status:** Draft; all results `Pending`
 - **Owner status:** Alisa is accountable owner for every entry; actual availability is pending
 - **Evidence status:** No test evidence recorded
 - **Source:** [PRD](../PRD.md), [implementation guide coverage](../IMPLEMENTATION_GUIDE.md#required-feature-coverage), and [TRD verification criteria](../TRD.md#12-measurable-non-functional-requirements-and-verification).
