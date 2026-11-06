@@ -1,0 +1,25 @@
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Local runtime data and databases
+data/
+runtime-data/
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+
+# Private captures and reference media (keep sanitized approved evidence explicitly)
+private-media/
+private-captures/
+*.private.jpg
+*.private.jpeg
+*.private.png
+*.private.mp4
+*.private.webm

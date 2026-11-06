@@ -8,7 +8,7 @@ scope: Complete approved MVP, laptop application and robot
 
 # Lost and Found — Implementation Guide
 
-Build the complete system in **18 phases, 00–17**, progressing from feasibility and safe hardware preparation to the assessed demonstration. Each phase has a linked checklist, acceptance criteria and required evidence. All phases start **Not started**: completed planning documents are not completed implementation.
+Build the complete system in **18 phases, 00–17**, progressing from feasibility and safe hardware preparation to the assessed demonstration. Each phase has a linked checklist, acceptance criteria and required evidence. Phase 00 is **In progress** while its baseline package is drafted; it is not accepted until availability, inventory inspection, assessment confirmation and whole-package review are recorded. Phases 01–17 remain **Not started**: completed planning documents are not completed implementation.
 
 This guide borrows the organization of the supplied [Pravaha implementation plan](../IMPLEMENTATION_PLAN.md). That document is a structural reference only. Its project instructions, technology choices, dates, completion claims, Git policies and expansion features do not govern Lost and Found. The reference file is preserved.
 
@@ -44,7 +44,7 @@ Dependencies are completion gates. Work inside a phase may begin against shared 
 
 | # | Phase | Depends on | Produces | Status |
 | --- | --- | --- | --- | --- |
-| [00](phases/PHASE-00-project-baseline.md) | Project baseline and execution setup | — | Requirement/evidence index, owners, equipment/deadline questions | Not started |
+| [00](phases/PHASE-00-project-baseline.md) | Project baseline and execution setup | — | Requirement/evidence index, owners, equipment/deadline questions | In progress — acceptance review pending |
 | [01](phases/PHASE-01-hardware-readiness.md) | Hardware review and preparation | 00 | Verified inventory; MCP-assisted pin-to-pin wiring list and custom Fritzing diagram; supervisor-reviewed power/wiring/programming plan; T2 clearance | Not started |
 | [02](phases/PHASE-02-laptop-and-vision-spike.md) | Laptop environment and vision feasibility | 00 | Recorded laptop, compatible candidate environment, offline model spike | Not started |
 | [03](phases/PHASE-03-application-foundation.md) | Application foundation and shared contracts | 02 | Next.js/FastAPI shell, contracts, protected local services, simulator interfaces | Not started |
@@ -139,7 +139,7 @@ An open hardware or numeric configuration question blocks its dependent implemen
 
 Each phase is Done only when its checklist tasks, acceptance checks and applicable gate evidence are complete. Record **what changed, release/configuration identifiers, checks run, results, failures, evidence location and remaining issues**. “UI looks finished,” a library example or simulated success alone is insufficient.
 
-Create the planned evidence index in Phase 00, with one row per FR/NFR/metric and links to relevant trials. Suggested working locations are `evidence/phase-XX/`, `evidence/qualification/` and `evidence/acceptance-index.md`; these names are organizational suggestions, not existing artifacts. Runtime media and secrets stay in their approved local storage/configuration locations, outside source control. Use the agreed assessment test objects for shared evidence.
+Phase 00's draft acceptance index is maintained at [`docs/phase-00/ACCEPTANCE-INDEX.md`](phase-00/ACCEPTANCE-INDEX.md), with one row per FR/NFR/metric and links to relevant trials. Suggested working locations for later evidence are `evidence/phase-XX/` and `evidence/qualification/`; these names are organizational suggestions, not existing artifacts. Runtime media and secrets stay in their approved local storage/configuration locations, outside source control. Use the agreed assessment test objects for shared evidence.
 
 Phase 16 must preserve these exact targets:
 
