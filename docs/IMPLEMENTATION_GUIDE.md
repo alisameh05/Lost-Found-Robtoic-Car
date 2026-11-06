@@ -8,9 +8,9 @@ scope: Complete approved MVP, laptop application and robot
 
 # Lost and Found — Implementation Guide
 
-Build the complete system in **18 phases, 00–17**, progressing from feasibility and safe hardware preparation to the assessed demonstration. Each phase has a linked checklist, acceptance criteria and required evidence. Phase 00 is **In progress** while its baseline package is drafted; it is not accepted until availability, inventory inspection, assessment confirmation and whole-package review are recorded. Phases 01–17 remain **Not started**: completed planning documents are not completed implementation.
+Build the complete system in **18 phases, 00–17**, progressing from feasibility and safe hardware preparation to the assessed demonstration. Each phase has a linked checklist, acceptance criteria and required evidence. Phase 00 is **In progress** while its baseline package is drafted; acceptance requires recorded team availability and a passing whole-package review. Assessment instructions and inventory details may remain pending when their owners, affected gates and next actions are recorded. Phases 01–17 remain **Not started**: completed planning documents are not completed implementation.
 
-This guide borrows the organization of the supplied [Pravaha implementation plan](../IMPLEMENTATION_PLAN.md). That document is a structural reference only. Its project instructions, technology choices, dates, completion claims, Git policies and expansion features do not govern Lost and Found. The reference file is preserved.
+This guide borrows the organization of a supplied Pravaha implementation plan, which is not included in this repository. That plan is a structural reference only. Its project instructions, technology choices, dates, completion claims, Git policies and expansion features do not govern Lost and Found.
 
 ## Source of truth
 
