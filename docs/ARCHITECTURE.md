@@ -7,8 +7,8 @@ paradigm: Layered modular application with one authoritative local service
 scope: Windows laptop application and prescribed camera robot
 status: final
 created: 2026-11-05
-updated: 2026-11-05
-binds: [FR-1–FR-17, NFR-1–NFR-6, SM-1, SM-C1, SM-2, SM-3, SM-4]
+updated: 2026-11-06
+binds: [FR-1–FR-18, NFR-1–NFR-6, SM-1, SM-C1, SM-2, SM-3, SM-4]
 sources: [PRD.md]
 companions: [TRD.md]
 ---
@@ -17,7 +17,7 @@ companions: [TRD.md]
 
 ## Authority and design paradigm
 
-This is the canonical technical decision record. Alisa adopted AD-1–AD-14 during the guided architecture session on 2026-11-05. The approved [PRD](PRD.md) owns scope and acceptance. This record governs technical invariants; [TRD.md](TRD.md) derives the implementation contracts. A conflict requires an explicit upstream revision, never an implicit override. Documentation finalization does not establish hardware compatibility or measured performance.
+This is the canonical technical decision record. Alisa adopted AD-1–AD-14 during the guided architecture session on 2026-11-05 and approved AD-15 on 2026-11-06. The [PRD](PRD.md) owns scope and acceptance. This record governs technical invariants; [TRD.md](TRD.md) derives the implementation contracts. A conflict requires an explicit upstream revision, never an implicit override. Documentation finalization does not establish hardware compatibility or measured performance.
 
 Use a **layered modular application with one authoritative local service**. Next.js owns presentation. FastAPI owns application state and coordinates adapters for devices, AI and storage. AI runs in a separate worker process and cannot command motors or mutate records. Arduino owns the final command-expiry stop. Implementation contracts below these boundaries live in the TRD.
 
@@ -96,7 +96,7 @@ Arrows represent permitted request/data dependencies, not electrical wiring. Nex
 
 - **Binds:** Input adapters, guidance and qualification; UX G4.
 - **Prevents:** Reversed gesture directions, mixed modes or undocumented controller indices.
-- **Rule:** One extended index finger points up/down/left/right in the mirrored displayed webcam view for forward/backward/left/right. Fist, no hand, multiple hands or ambiguity stops motion. PS4/PS5 use held D-pad directions; release/conflict stops; Circle is emergency stop. UI emergency stop remains available in both modes. Qualify recognition thresholds and actual device mappings before driving.
+- **Rule:** One extended index finger points up/down/left/right in the mirrored displayed webcam view for forward/backward/left/right. Fist, no hand, multiple hands or ambiguity stops motion. PS4 DualShock 4 uses held D-pad directions; release/conflict stops; Circle is emergency stop. UI emergency stop remains available in both modes. PS5 support is removed under PRD v1.1 with supervisor approval. Qualify recognition thresholds and the actual device mapping before driving.
 
 ### AD-11 — Reference image contract [ADOPTED]
 
@@ -120,7 +120,13 @@ Arrows represent permitted request/data dependencies, not electrical wiring. Nex
 
 - **Binds:** Implementation, procurement, assembly and acceptance.
 - **Prevents:** Treating a completed document as approval of unknown equipment or performance.
-- **Rule:** Keep exact laptop/Windows/GPU/controllers, board variants/programming access, motor/driver compatibility, power/wiring, route, measured timeouts/model settings and branding open at the TRD's named gates. Do not invent values, buy extra parts or reduce scope. Finalize documentation with these gates open by Alisa's express direction.
+- **Rule:** Record the owner-confirmed purchased inventory in PRD v1.1. Keep remaining motor/driver compatibility, battery charging, regulator load, wiring, route measurements, measured timeouts/model settings and branding open at the TRD's named gates. Do not invent electrical values or acquire replacement parts without the required supervisor approval.
+
+### AD-15 — Proximity warning has no motion authority [ADOPTED]
+
+- **Binds:** HC-SR04 telemetry, workspace warning and FR-18.
+- **Prevents:** An advisory sensor silently becoming obstacle avoidance, a motion stop, or proof that the route is clear.
+- **Rule:** Show a silent on-screen warning at a calibrated threshold and clear it only after the sensor reports the agreed clear condition. The sensor never changes movement, session or readiness state. A missing/invalid reading is not a clear reading; the threshold and clear condition remain T4 configuration items.
 
 ## Consistency conventions
 

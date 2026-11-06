@@ -11,14 +11,14 @@ Implement the adopted held-input mappings and fresh/neutral sample semantics for
 - [ ] Capture the selected laptop webcam through the backend and derive pointing direction from MediaPipe hand landmarks.
 - [ ] Verify mirrored displayed coordinates: one extended index finger up/down/left/right means forward/backward/left/right. Closed fist, no hand, multiple hands or ambiguity means ordinary stop.
 - [ ] Select and record recognition, ambiguity and neutral/reapply thresholds from local tests; no guessed confidence value becomes an approved default.
-- [ ] Implement Pygame polling/hotplug for both actual PS4 and PS5 profiles: held D-pad direction moves, release/conflict stops, Circle triggers emergency stop.
+- [ ] Implement Pygame polling/hotplug for the actual PS4 DualShock 4 profile: held D-pad direction moves, release/conflict stops, Circle triggers emergency stop.
 - [ ] Emit timestamped samples with device identity/generation, validity, direction/neutral and disconnection causes. Do not silently substitute another controller.
 - [ ] Keep polling independent of browser foreground behavior; the coordinator will separately enforce visible/focused workspace eligibility.
 - [ ] Build local mapping/readiness guidance. A missing inactive webcam/controller must not block the selected mode; selected gesture webcam failure must be observable.
 
 ## Acceptance and evidence
 
-Every approved direction, release, conflict and invalid gesture is correctly represented without motor movement. Disconnects invalidate old samples. PS4 and PS5 use verified profiles rather than guessed button numbers. A held pre-failure input cannot masquerade as neutral then a new hold. Unavailable required hardware prevents completion, although simulator work can continue.
+Every approved direction, release, conflict and invalid gesture is correctly represented without motor movement. Disconnects invalidate old samples. The PS4 DualShock 4 uses a verified profile rather than guessed button numbers. A held pre-failure input cannot masquerade as neutral then a new hold. Unavailable required hardware prevents completion, although simulator work can continue.
 
 **Save:** device/profile inventory, mirrored-direction checks, threshold rationale/results, input/disconnect traces and guidance captures.
 

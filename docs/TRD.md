@@ -1,9 +1,9 @@
 ---
 title: "Lost and Found — Technical Requirements Document"
-version: "1.0"
+version: "1.1"
 status: final
 created: 2026-11-05
-updated: 2026-11-05
+updated: 2026-11-06
 audience: Implementation team
 architecture: ARCHITECTURE.md
 requirements: PRD.md
@@ -18,20 +18,20 @@ This TRD defines the implementation contract for the Windows laptop application 
 
 Read sources in this order:
 
-1. [Approved PRD v1.0](PRD.md): scope, FR-1–FR-17, NFR-1–NFR-6 and success metrics.
-2. [Architecture decision record](ARCHITECTURE.md): AD-1–AD-14 adopted by Alisa in the guided architecture session on 2026-11-05. This is the technical source of truth.
+1. [Approved PRD v1.1](PRD.md): scope, FR-1–FR-18, NFR-1–NFR-6 and success metrics.
+2. [Architecture decision record](ARCHITECTURE.md): AD-1–AD-14 adopted by Alisa on 2026-11-05 and AD-15 adopted on 2026-11-06. This is the technical source of truth.
 3. This TRD: detailed contracts derived under Alisa's explicit authorization.
 4. [EXPERIENCE.md](../_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/EXPERIENCE.md) and [DESIGN.md](../_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/DESIGN.md): application flows and functional visual guidance. Their stated assumptions remain proposals unless adopted below. Branding is still deferred.
 
-This session resolved UX G1–G3 through AD-6, input/image rules in G4 through AD-10/AD-11, and G5 through AD-9. G4 thresholds/device qualification, G6 branding/accessibility qualification and G7 equipment/performance remain explicit gates. Existing PRD and UX files are preserved; this document records the later decisions without rewriting their approval history. The addendum's former stack proposals are adopted only to the extent explicitly recorded in AD-2/AD-8. The workspace components PDF is not procurement authority.
+This session resolved UX G1–G3 through AD-6, input/image rules in G4 through AD-10/AD-11, and G5 through AD-9. PRD v1.1 and AD-15 record the PS4-only, purchased-inventory and advisory proximity-warning decisions. G4 thresholds/device qualification, G6 branding/accessibility qualification and G7 equipment/performance remain explicit gates. Earlier UX files are preserved as historical handoffs; this document records later decisions. The addendum's former stack proposals are adopted only to the extent explicitly recorded in AD-2/AD-8. The workspace components PDF is a product reference; PRD v1.1 records the owner-confirmed purchased inventory.
 
 Alisa authorized completion with the section 13 gates open. Software can be designed against this contract; assembly and assessed acceptance must wait for their applicable gates. A failure to meet a target requires evidence and an explicit requirement/architecture revision, not a smaller demonstration presented as a pass.
 
 ## 2. Operating scope and technology stack
 
-One operator at a fixed desk uses one Windows laptop, one robot, one selected target and at most one active session, including Paused. The robot searches connected rooms on one floor. Both gesture and PS4/PS5 control are required. Internet is unnecessary after setup; protected local Wi-Fi remains available. Navigation is manual, using live video. People remain clear of the route and obstacles are stationary.
+One operator at a fixed desk uses one Windows laptop, one robot, one selected target and at most one active session, including Paused. The robot searches two adjacent connected rooms on one floor. Gesture and PS4 DualShock 4 control are required; PS5 support was removed with supervisor approval. Internet is unnecessary after setup; protected local Wi-Fi remains available. The laptop camera supplies gesture input and the ESP32-CAM supplies robot video. Navigation is manual, using live video. People remain clear of the route and obstacles are stationary.
 
-No autonomous navigation, obstacle detection, ultrasonic/servo functionality, mapping/GPS, retrieval, public sharing, cloud accounts, guaranteed unique-object recognition or additional operating systems are introduced. A visually similar candidate requires human review.
+No autonomous navigation, obstacle avoidance/steering, servo functionality, mapping/GPS, retrieval, public sharing, cloud accounts, guaranteed unique-object recognition or additional operating systems are introduced. The HC-SR04 is advisory only: it produces the FR-18 silent visual warning and never commands a stop, pause or direction. A visually similar candidate requires human review.
 
 | Layer | Selected technology | Responsibility / version condition |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ No autonomous navigation, obstacle detection, ultrasonic/servo functionality, ma
 | Video and images | OpenCV | Webcam capture, image processing and frame decoding. Preserve source freshness metadata outside the decoder. |
 | Gestures | MediaPipe hand landmarks | Derive the approved pointing directions from landmarks; do not assume the canned gesture labels implement arbitrary pointing directions. |
 | Candidate matching | Ultralytics YOLOE visual prompting, PyTorch | Prompt with the selected reference region; use the laptop's NVIDIA GPU after compatibility and performance checks. Exact checkpoint/settings at T1/T5. |
-| Controller | Pygame/SDL | Backend reads the selected PS4/PS5 controller and handles hotplug/disconnect. Qualify actual device mappings. |
+| Controller | Pygame/SDL | Backend reads the selected PS4 DualShock 4 and handles hotplug/disconnect. Qualify the actual device mapping. |
 | Movement connection | pySerial; HC-05 Bluetooth serial | Bounded command/response I/O to Arduino; no browser Bluetooth requirement. |
 | Firmware | Arduino Uno firmware; ESP32-CAM firmware | Command-expiry stopping; camera acquisition/freshness metadata and local video. Toolchain/board-core versions at T2/T6. |
 
@@ -106,7 +106,7 @@ AI runs in a separate process. Capture/decode, controller polling, serial I/O an
 | Registration | Required name, JPEG/PNG validation, reference preview and rectangular target selector | Repeat validation; commit only a complete record |
 | Object/session detail | Reference, status, registration/expiry, every session and review evidence | Durable facts; expired/missing media must not be replaced with unrelated images |
 | Search setup | Target summary, exclusive mode selection, readiness and mapping instructions | Atomic Start guard; no session until accepted |
-| Workspace | Required left webcam/gesture panel and right robot-video/AI panel; target/mode/state; stable controls | Authoritative session, latest eligible frames and readiness |
+| Workspace | Required left laptop-webcam/gesture panel and right robot-video/AI panel; target/mode/state; stable controls; silent HC-SR04 warning | Authoritative session, latest eligible frames, proximity-warning state and readiness |
 | Match review | Captured evidence/box, reference comparison, Confirm/Reject/Stop | Candidate paused before review; consistent persisted decision |
 | Recovery | Every unresolved cause, acknowledgment/readiness and Resume eligibility | Latched failures and fresh-input rearm |
 | Retention settings | Integer 1–30 days, impact preview, explicit confirmation, save/error feedback | Reject change during active/Paused session; preserve prior value on failed save |
@@ -128,6 +128,7 @@ Object state is exactly **Lost** or **Found**. Session state is exactly **Search
 | Register complete usable image/name/ROI | No movement | New independent Lost object with immutable registration time |
 | Start | Searching, initially disarmed until neutral then fresh input | Require Lost/unexpired target, no active session, healthy storage/AI, selected input, command path, live/displayed video and controlling workspace |
 | Release/unrecognized gesture/conflicting input | Stop movement | May remain Searching while required capabilities are healthy |
+| HC-SR04 reading crosses calibrated warning threshold | No change to movement or session state | Show silent advisory warning; clear after calibrated clear condition; never infer safety from a missing/invalid reading |
 | Pause | Stop movement and matching; Paused | Same session, target and locked mode |
 | Potential match | Revoke movement and matching before review | Paused; retain exact candidate frame/box; prepare durable evidence |
 | Confirm | Remain stopped | Atomically set candidate Confirmed/review time, object Found/confirmation time and session Ended; evidence must be durable |
@@ -152,11 +153,11 @@ Rejected candidate suppression belongs to the session, not permanent identity re
 | --- | --- |
 | One index finger pointing up/down/left/right in mirrored displayed webcam coordinates | Forward/backward/left/right while held |
 | Closed fist, no hand, multiple hands, ambiguous/invalid pointing | Ordinary motion stop; no stale direction substitution |
-| PS4/PS5 held D-pad up/down/left/right | Forward/backward/left/right |
+| PS4 DualShock 4 held D-pad up/down/left/right | Forward/backward/left/right |
 | D-pad release or conflicting directions | Ordinary motion stop |
-| PS4/PS5 Circle; UI Emergency stop in either mode | Emergency stop and recovery latch |
+| PS4 DualShock 4 Circle; UI Emergency stop in either mode | Emergency stop and recovery latch |
 
-The backend reads the webcam/controller directly. It reports input samples with connection generation and monotonic age. No webcam image needs to be uploaded from the browser. Inactive-mode input never commands motion. Poll/pump controller events independently of browser focus, then apply the focused-workspace gate; do not rely on default SDL foreground behavior to provide safe samples. Verify PS4 and PS5 profiles rather than hardcoding a guessed joystick index. Thresholds, ambiguity boundaries and firmware speed/PWM choices remain T4/T6 configuration gates.
+The backend reads the laptop webcam/controller directly. It reports input samples with connection generation and monotonic age. No webcam image needs to be uploaded from the browser. Inactive-mode input never commands motion. Poll/pump controller events independently of browser focus, then apply the focused-workspace gate; do not rely on default SDL foreground behavior to provide safe samples. Verify the PS4 DualShock 4 profile rather than hardcoding a guessed joystick index. Thresholds, ambiguity boundaries and firmware speed/PWM choices remain T4/T6 configuration gates.
 
 ### 6.2 Live video
 
@@ -181,6 +182,10 @@ For every SM-2 path, qualify a worst-case budget from the actual release/loss ev
 `loss/input detection + permission revocation/transport or last-valid-device-lease expiry + output change + measured mechanical stopping <= 0.5 seconds`.
 
 Conservatively include outstanding valid challenges/commands, scheduling delay and clock-age uncertainty. Backend failure and queued-message cases must pass independently; a fast explicit STOP is not enough. Timers cannot each consume the full 0.5-second allowance. T6 selects measured component budgets with positive remaining margin and records every number; no numeric watchdog value or stopping capability is asserted here.
+
+### 6.4 Advisory proximity warning
+
+The HC-SR04 supplies proximity observations for FR-18 and is mounted facing forward. The exact connection/telemetry path is a T2/T6 implementation decision and must use only reviewed wiring. T4 calibrates separate warning and clearing distances at the selected indoor speed to prevent flicker; no distance is inferred from the component photos. The workspace displays a silent warning and clears it only after valid readings meet the tested clear condition. Missing/invalid readings are unknown, never clear. This advisory path has no authority over movement, session state or motion readiness.
 
 ## 7. Database schema and relationships
 
@@ -274,7 +279,7 @@ Use success responses only for established outcomes; a pending save is explicitl
 
 ### 9.3 Events, frames and control leases
 
-Each JSON state event uses `protocol_version=1`, `backend_boot_id`, increasing integer `event_seq`, nullable `session_id`/`session_revision`, `type`, `occurred_at_ms` and typed `payload`. Types are `snapshot`, `session_changed`, `readiness_changed`, `candidate_pending`, `recovery_changed`, `retention_changed`, `object_removed`, `storage_fault`. A sequence gap/reconnect requires a full snapshot before control eligibility. Snapshots include active session/object facts, resource revisions, required-path readiness, unresolved failure IDs, pending candidate, lease owner/eligibility and effective retention deadline/grace. Event order does not substitute for resource revisions.
+Each JSON state event uses `protocol_version=1`, `backend_boot_id`, increasing integer `event_seq`, nullable `session_id`/`session_revision`, `type`, `occurred_at_ms` and typed `payload`. Types are `snapshot`, `session_changed`, `readiness_changed`, `candidate_pending`, `recovery_changed`, `retention_changed`, `object_removed`, `storage_fault` and `proximity_warning_changed`. A sequence gap/reconnect requires a full snapshot before control eligibility. Snapshots include active session/object facts, resource revisions, required-path readiness, unresolved failure IDs, pending candidate, lease owner/eligibility, proximity-warning state and effective retention deadline/grace. Event order does not substitute for resource revisions.
 
 Video protocol v1 uses one binary WebSocket message per frame: an unsigned 32-bit big-endian metadata-byte length, UTF-8 JSON metadata, then JPEG bytes. Metadata fields are `protocol_version`, `source` (robot/webcam), `stream_epoch`, integer `capture_seq`, `frame_id`, integer `width`/`height`, `received_at_ms` and `capture_age_bound_ms`; robot metadata also carries its source capture timestamp/clock epoch. Encode source monotonic timestamps as integer microseconds and persistent/UTC times as integer milliseconds. Negotiate and enforce frame/header byte limits at T6 before allocation/decode. Display acknowledgment carries the backend-issued `frame_id` and epoch; the backend validates them and includes elapsed time through acknowledgment receipt in its conservative age bound, without trusting the browser's clock.
 
@@ -287,7 +292,7 @@ Every recovery occurrence has a unique backend-issued `failure_id`, owning nulla
 | Integration | Input/output contract | Failure rule |
 | --- | --- | --- |
 | Laptop webcam | Selected device, timestamped fresh frames; mirrored display coordinates map consistently to direction classifier | In gesture mode: stale/lost input stops and required-device loss pauses; controller mode does not require webcam |
-| PS4/PS5 | Selected device identity/profile, D-pad/Circle state, connection generation and sample age | Disconnect pauses; unknown mapping blocks readiness; another controller does not silently replace it |
+| PS4 DualShock 4 | Selected device identity/profile, D-pad/Circle state, connection generation and sample age | Disconnect pauses; unknown mapping blocks readiness; another controller does not silently replace it |
 | HC-05/Uno | Paired Windows serial port; versioned expiring protocol in section 6 | Missing/invalid responses or new Uno boot invalidate readiness and latch recovery |
 | ESP32-CAM | Existing protected Wi-Fi, bounded frame envelope and clock-age exchange | Capture/display staleness or uncertain timing stops/pauses; reconnect alone does not Resume |
 | YOLOE/MediaPipe assets | Locally installed approved files/checksums and reproducible configuration | Missing/corrupt/incompatible assets block Start; runtime AI failure stops/pauses; no online fallback |
@@ -372,14 +377,14 @@ These are intentionally open under AD-14, not unspecified implementation default
 | Gate | Required decision/evidence | Owner and deadline |
 | --- | --- | --- |
 | T1 Runtime and dependency lock | Exact supported Windows/browser/Node/Python/packages/SQLite/GPU runtime combination; local asset/model inventory, hashes and license notices; reproducible environment and durable SQLite settings. Do not choose versions solely because a machine currently has them installed. | Software team; early laptop benchmark before functional implementation is baselined/tested |
-| T2 Hardware and electrical design | Exact board/chassis/motor/module variants; motor current versus L298N capability, thermal/power requirements; cell count/configuration and matching holder/charger/BMS/regulator; safe wiring/logic levels, switch and motor-disabled reset; programming connectors/access with prescribed parts. Produce supervisor-reviewed wiring/power plan. | Hardware team with supervisor; before procurement/assembly/energizing relevant circuits |
-| T3 Equipment and route | Exact laptop/Windows/GPU/driver/webcam, PS4 and PS5 availability/profiles, existing Bluetooth/Wi-Fi capability, protected network and camera endpoint, fixed-desk connected-room route and dimensions. Measure coverage on both links. | Team; early integration before route qualification |
-| T4 Input and UI operating setup | Gesture orientation/ambiguity/neutral thresholds; actual controller profiles; release/reapply behavior; camera/scaling/minimum usable operational layout; mode-independent stop accessibility. | Input/frontend team; before driving/function tests |
+| T2 Hardware and electrical design | PRD section 6 records the purchased inventory, including one single-bay charger and one TG-008 two-bay charger. Select removable-cell charging: two cells in the two-bay unit and one in the single-bay unit, conditional on verified independent per-bay specifications and compatible cell ratings; neither charger connects to the assembled 3S pack. Verify BMS cell-junction connections. Select left/right motor pairs on separate L298 channels, conditional on combined startup/stall current and thermal limits. Verify the pictured 7805 5V/100mA against all loads and request the approved power-component change if inadequate; review wiring, logic levels, switch, motor-disabled reset and programming access. | Hardware team with supervisor; before wiring/energizing relevant circuits |
+| T3 Equipment and route | LOQ 15IRH8 / Windows 11 Pro / RTX 4050 / 16 GB, laptop camera, one PS4 DualShock 4, existing Bluetooth/Wi-Fi capability, protected network and camera endpoint, fixed-desk route through two adjacent rooms. Measure coverage on both links. | Team; early integration before route qualification |
+| T4 Input and UI operating setup | Gesture orientation/ambiguity/neutral thresholds; PS4 DualShock 4 mapping; release/reapply behavior; HC-SR04 warning/clear thresholds; camera/scaling/minimum usable operational layout; mode-independent stop accessibility. | Input/frontend team; before driving/function tests |
 | T5 Matching and continuity | YOLOE visual-prompt checkpoint, compatible assets, inference/candidate thresholds, frame policy, tracking association/exit criteria and continuity-loss recovery; freeze five objects/references/lighting/placements with supervisor. | Vision team; early benchmark and before SM-1/SM-C1 |
-| T6 Firmware, protocol and timing | Serial encoding/rate/length/sequence/challenge/lease and command acknowledgment; camera epoch/sequence/age protocol and clock uncertainty; browser display acknowledgments; motor speed/output handling and physical stop budget. Freeze exact numbers and versions, then execute end-to-end stop/video/endurance trials. | Integration/firmware team; before moving tests and assessed qualification |
+| T6 Firmware, protocol and timing | Serial encoding/rate/length/sequence/challenge/lease and command acknowledgment; camera epoch/sequence/age protocol and clock uncertainty; browser display acknowledgments; motor speed/output handling, any HC-SR04 telemetry transport, and physical stop budget. Freeze exact numbers and versions, then execute end-to-end stop/video/endurance trials. | Integration/firmware team; before moving tests and assessed qualification |
 | T7 Visual approval and assessment | Alisa's branding/density/icon/type choices, actual contrast/keyboard/reflow/scaling evidence, exact assessment date and final report/demo plan. | Alisa/team with supervisor; before visual sign-off and assessed demonstration |
 
-T2 can expose a conflict between required safety/compatibility and the prescribed purchase list, including programming access. Escalate that conflict to Alisa/supervisor; this document does not authorize extra components or a guessed wiring workaround. T3/T6 failures cannot be resolved by dropping multi-room scope or relaxing timing without explicit revision. Required measurements stay pending until equipment exists.
+T2 can expose conflicts between safety/compatibility and the purchased inventory, including the charging method and regulator load. Escalate any conflict to Alisa and the supervisor; do not energize against a guessed workaround. A power-component change requires supervisor approval before procurement. T3/T6 failures cannot be resolved by dropping multi-room scope or relaxing timing without explicit revision. Required measurements stay pending until equipment exists.
 
 ## 14. Traceability and technical references
 
@@ -404,6 +409,7 @@ T2 can expose a conflict between required safety/compatibility and the prescribe
 | FR-15 Retention | Registration formula, active grace, runtime/startup purge and real file cleanup; 7–8 | AD-7, AD-9 |
 | FR-16 Local/no login | Offline services, shared local data and no accounts; 2, 10–11 | AD-1, AD-12 |
 | FR-17 Deliberate recovery | All causes restored/acknowledged, Resume and fresh hold; 5–6 | AD-5–AD-6 |
+| FR-18 Proximity warning | Calibrated HC-SR04 reading produces a silent advisory UI warning; clear condition is tested; no motion/session authority; 4, 6, 12 | AD-15 |
 | NFR-1–NFR-6; SM-1/SM-C1/SM-2–SM-4 | Complete verification table and explicit exit gates; 12–13 | AD-1, AD-3–AD-5, AD-8, AD-14 |
 
 There is no automatic search-duration limit. No record from a Found object can be reused as a new Lost registration; use a new object ID/time/reference/selection. Stop and rejection never change a Found record back to Lost.

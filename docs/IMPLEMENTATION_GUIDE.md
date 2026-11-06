@@ -1,7 +1,7 @@
 ---
 title: "Lost and Found — Implementation Guide"
 created: 2026-11-05
-updated: 2026-11-05
+updated: 2026-11-06
 status: plan-only
 scope: Complete approved MVP, laptop application and robot
 ---
@@ -16,8 +16,8 @@ This guide borrows the organization of the supplied [Pravaha implementation plan
 
 | Source | Owns |
 | --- | --- |
-| [PRD.md](PRD.md) | Approved scope, FR-1–FR-17, NFR-1–NFR-6 and acceptance metrics |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Adopted AD-1–AD-14; canonical technical decisions |
+| [PRD.md](PRD.md) | Approved scope, FR-1–FR-18, NFR-1–NFR-6 and acceptance metrics |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Adopted AD-1–AD-15; canonical technical decisions |
 | [TRD.md](TRD.md) | Schema, interfaces, device/safety contracts, deployment and gates T1–T7 |
 | [EXPERIENCE.md](../_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/EXPERIENCE.md) and [DESIGN.md](../_bmad-output/planning-artifacts/ux-designs/ux-Robotics-2026-11-05/DESIGN.md) | User flows and visual guidance, with the later TRD decisions and remaining UX assumptions respected |
 | This guide and phase checklists | Work order, deliverables, evidence and handoffs; no authority to alter approved requirements |
@@ -30,13 +30,13 @@ The finished system must support this sequence from the operator's fixed desk:
 
 1. Register a belonging using its name, a reference image and one selected target region.
 2. Select a control mode and start only when all required capabilities are ready.
-3. Drive through connected rooms using the live robot feed. Held input moves; release stops.
+3. Drive through connected rooms using the live robot feed. Held input moves; release stops. During controlled integration, show the silent HC-SR04 warning and confirm it clears on the tested clear condition without changing motion/session state.
 4. Receive a potential match: the robot stops and the session pauses with captured evidence.
 5. Reject a candidate, remain Paused, then explicitly Resume; suppress the same continuously visible rejected candidate.
 6. Confirm the intended candidate: save evidence, mark Found and end the session.
 7. Restart the application and inspect unexpired history. Show that faults/reconnection cannot restart motion and retention deletes stored records and images correctly.
 
-Demonstrate gestures and PS4/PS5 control in **separate sessions**. An unsuccessful Ended/Lost session may reuse its registration in another mode; a Found object requires a new registration. Do not switch modes during Searching or Paused. This walkthrough organizes the build; every approved requirement still applies, including the separate twenty-minute endurance trial.
+Demonstrate gestures and PS4 DualShock 4 control in **separate sessions**. An unsuccessful Ended/Lost session may reuse its registration in another mode; a Found object requires a new registration. Do not switch modes during Searching or Paused. This walkthrough organizes the build; every approved requirement still applies, including the separate twenty-minute endurance trial.
 
 ## Phases
 
@@ -63,22 +63,33 @@ Dependencies are completion gates. Work inside a phase may begin against shared 
 | [16](phases/PHASE-16-system-qualification.md) | Whole-system qualification | 15 | Complete FR/NFR results, all five metrics and fault/security regression evidence | Not started |
 | [17](phases/PHASE-17-report-and-demonstration.md) | Report, demonstration and handoff | 16 | Assessed report/demo package, release archive and honest limitations | Not started |
 
-Phase 09 is the convergence point for persistence, video, firmware, input and matching. From there the main sequence is **09 → 10 → 11 → 12 → 14 → 15 → 16 → 17**, with Phase 14 also requiring Phase 13. Phases 01 and 02 can run in parallel. Phase 13 can overlap Phase 12 once its own dependencies are complete; operational safety/legibility cannot wait for final branding.
+Phase 09 is the convergence point for persistence, video, firmware, input and matching. From there the main sequence is **09 → 10 → 11 → 12 → 14 → 15 → 16 → 17**, with Phase 14 also requiring Phase 13. Although the dependency graph permits Phases 01 and 02 to run in parallel, this hardware-first schedule completes Phase 01 before starting Phase 02. Phase 13 can overlap Phase 12 once its own dependencies are complete; operational safety/legibility cannot wait for final branding.
+
+## Hardware-first execution order
+
+Keep the phase IDs and dependency gates below as the source of truth, but execute the work in these blocks so the physical build is ready before the main application work:
+
+1. **Baseline and hardware readiness — Phases 00–01.** Inventory the exact parts, resolve the supervisor-reviewed power/wiring/programming plan (T2), inspect the parts, then assemble and wire only as that cleared plan allows. Leave motor power/output disabled. This completes the physical build/readiness work, not proof that the integrated robot operates safely.
+2. **Software and stationary subsystem work — Phases 02–11 and 13.** Build the laptop/application, camera streaming, firmware/command handling, controls, matching, safety, history and usable UI. Phases 05 and 06 include hardware-facing software and bench checks; they still depend on Phase 03 and keep motor movement disabled. Do not delay independent software work while waiting for physical movement tests.
+3. **Controlled robot integration — Phase 12.** After Phases 09–11 pass their gates, bring the assembled robot into the full guarded application. Verify disabled outputs and safe wheel-stop behavior before floor operation. This is the first phase that enables actual movement; it cannot be completed before the software safety path exists.
+4. **Release, route, qualification and handoff — Phases 14–17.** Follow the dependencies in the phase table.
+
+“Finish hardware first” therefore means complete and inspect the physical assembly/wiring before the main software build, with motors isolated. The end-to-end hardware acceptance—camera freshness through the application, serial command expiry, and safe physical movement—requires software and remains gated by Phases 05, 06 and 12. Do not energize or drive early to make the schedule appear complete.
 
 ## Milestones and scheduling
 
-The PRD records an expected three-to-six-week assessment window as of 2026-11-05, but no exact date, staffing capacity or hardware lead time is confirmed. The following is an **execution order, not a calendar commitment**. During Phase 00, assign people and dates using actual availability; reserve explicit time for failed trials, fixes and reruns.
+The PRD records a four-week completion window as of 2026-11-06, with 2026-12-04 as the planning target if that window starts on 2026-11-06. The final result will be demonstrated through supervised manual testing; the exact assessment date and staffing capacity remain unconfirmed. The following milestones define execution order. During Phase 00, assign people and dates using actual availability; reserve explicit time for failed trials, fixes and reruns.
 
 | Milestone | Phases | Show this before progressing |
 | --- | --- | --- |
-| M1 — Feasibility established | 00–02 | Equipment gaps known; compatible local inference spike; supervisor-reviewed hardware plan |
-| M2 — Components work without driving | 03–08 | Persisted registration, actual camera freshness, command expiry, both input families, local worker |
-| M3 — Complete logic while stationary | 09–11 | Full search/review/history/retention and failure sequences using disabled motors or controlled fixtures |
-| M4 — Safe integrated robot | 12–13 | Held-input movement and physical stops with all required services active; complete usable UI |
+| M1 — Physical hardware ready | 00–01 | Parts inspected; supervisor-reviewed power/wiring/programming plan; physical assembly ready with motor power/output disabled |
+| M2 — Software feasibility and foundation | 02–04 | Compatible local inference spike; application shell; registration and persistence |
+| M3 — Software and stationary subsystems | 05–11, 13 | Actual camera path, disabled-output command-expiry checks, both input families, local worker, guarded stationary flow, history/retention and usable UI |
+| M4 — Safe integrated robot | 12 | Held-input movement and measured physical stops with all required services active |
 | M5 — Release and route frozen | 14–15 | Offline production launch and fixed-desk multi-room operation on the recorded configuration |
 | M6 — Qualification and assessment | 16–17 | Recorded complete-system passes, report, rehearsed demonstration and release archive |
 
-**Discover expensive failures early:** test model compatibility before building the full UI; check programming/power compatibility before assembly; probe room-to-room video/serial coverage with motor outputs disabled in Phases 05/06. Repeat the route with the actual moving application in Phase 15. An early bench probe never counts as final route qualification.
+**Discover expensive failures early:** check hardware/programming/power compatibility before assembly; complete the physical assembly with motor power/output disabled before the main software build; test model compatibility before building the full UI; probe room-to-room video/serial coverage with motor outputs disabled in Phases 05/06. Repeat the route with the actual moving application in Phase 15. An early bench probe never counts as final route qualification.
 
 ## Team split
 
@@ -91,7 +102,7 @@ Assign names in Phase 00; these are responsibility groups, not assumed team memb
 | Frontend/experience | 03 UI, 04 registration, 05 display acknowledgments, 09/10 controls/review, 11 settings, 13 | Consume shared types; never duplicate backend state authority |
 | Integration/evidence | 00 tracking, 12, 14–17 | Record results throughout; coordinate fixes with the owning track |
 
-For a solo build, follow the dependency table rather than trying to finish every screen before touching hardware. Keep the report/evidence index current from Phase 00 onward; Phase 17 assembles the report instead of reconstructing missing measurements.
+For a solo build, complete the physical assembly/readiness block first, then follow the dependency table for software and subsystem work. Keep the robot motor-disabled until Phase 12's entry gate passes. Keep the report/evidence index current from Phase 00 onward; Phase 17 assembles the report instead of reconstructing missing measurements.
 
 ## Open-gate ownership
 
@@ -146,6 +157,7 @@ Phase 16 must preserve these exact targets:
 | FR-15 Configurable retention/real deletion | 04 storage primitives, 11 full lifecycle | 16 |
 | FR-16 Local/no login/no normal upload | 03, 14 | 16 |
 | FR-17 Deliberate recovery/fresh input | 06, 07, 09, 11, 12 | 16 |
+| FR-18 Advisory proximity warning | 01, 06, 12 | 12, 16, 17 |
 | NFR-1 Offline complete searching | 02, 03, 08, 14 | 16 |
 | NFR-2 Fixed-desk multi-room operation | 05/06 early probes, 12, 15 | 16 |
 | NFR-3 Windows/NVIDIA laptop | 02, 08, 14 | 16 |
@@ -166,4 +178,4 @@ Phase 16 must preserve these exact targets:
 
 ## First action
 
-Start with [Phase 00](phases/PHASE-00-project-baseline.md). Its first handoffs are the hardware review in Phase 01 and the laptop/vision spike in Phase 02. Creating this guide completes no phase and purchases, assembles, deploys or runs nothing.
+Start with [Phase 00](phases/PHASE-00-project-baseline.md), then complete the hardware review and physical readiness work in Phase 01 before starting the Phase 02 laptop/vision spike. Creating this guide completes no phase and purchases, assembles, deploys or runs nothing.

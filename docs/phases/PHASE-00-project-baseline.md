@@ -23,4 +23,4 @@ The team can identify who resolves each open gate and where each requirement wil
 
 ## Done and handoff
 
-Done when the baseline and owners are recorded. Open questions may remain at their approved gates. Start [Phase 01](PHASE-01-hardware-readiness.md) and [Phase 02](PHASE-02-laptop-and-vision-spike.md) in parallel.
+Done when the baseline and owners are recorded. Open questions may remain at their approved gates. Complete [Phase 01](PHASE-01-hardware-readiness.md) before starting [Phase 02](PHASE-02-laptop-and-vision-spike.md) under the hardware-first execution order in the implementation guide.

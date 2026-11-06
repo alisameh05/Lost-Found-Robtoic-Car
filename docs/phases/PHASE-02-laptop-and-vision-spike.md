@@ -8,7 +8,7 @@ Expose compatibility and reference-matching risks before building the full appli
 
 ## Work
 
-- [ ] Record the actual laptop/Windows, GPU/driver, webcam, browser, existing Bluetooth/Wi-Fi capability and access to PS4/PS5 devices.
+- [ ] Record the actual LOQ 15IRH8 laptop/Windows/GPU/driver, built-in gesture camera, browser, existing Bluetooth/Wi-Fi capability and PS4 DualShock 4 model.
 - [ ] Select a supported, mutually compatible Node/Next.js/React/TypeScript and Python/FastAPI/vision/input package combination using current primary documentation. Record versions and installation steps; do not assume the newest package fits every dependency.
 - [ ] Run local MediaPipe hand-landmark and webcam smoke checks; verify controller enumeration and serial-library availability where devices are available.
 - [ ] Exercise YOLOE visual prompting from a selected reference region against sample frames using the intended local PyTorch/GPU runtime. Record candidate boxes, misses and resource/timing observations.

@@ -1,9 +1,9 @@
 ---
 title: "Lost and Found — Product Requirements Document"
 status: final
-version: "1.0"
+version: "1.1"
 created: 2026-11-05
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 # Lost and Found — Product Requirements Document
@@ -18,7 +18,7 @@ This PRD defines the complete system for a university project assessed through a
 
 One person finding belongings in an office/shared space uses one Windows laptop, one robot, and one target per active search. The operator stays at a fixed desk while the robot searches multiple connected rooms on one floor.
 
-Acceptance testing uses furnished rooms with stationary obstacles and people kept clear of the robot's path. Targets are visible on the floor or low shelves within the camera's view. The operator steers around obstacles using live video; autonomous navigation and obstacle detection are outside the MVP.
+Acceptance testing uses two adjacent furnished rooms with stationary obstacles and people kept clear of the robot's path. Targets are visible on the floor or low shelves within the camera's view. The operator steers around obstacles using live video. An HC-SR04 may provide a silent on-screen proximity warning; it does not stop, steer, or avoid obstacles.
 
 Local Wi-Fi is available; internet access is not assumed after installation/setup. Wireless operation is preferred, while wired connections are acceptable for the demonstration. Either arrangement must still satisfy the fixed-desk, connected-room requirement.
 
@@ -36,7 +36,7 @@ This illustrative walkthrough summarizes chosen rules, rather than reporting an 
 | Search session | One attempt to find a registered target, including its state, times, and match-review history. |
 | Lost / Found | Object statuses. A new record is Lost; explicit confirmation changes it to Found. |
 | Searching / Paused / Ended | Session states. Paused disables movement and AI matching; Ended cannot be resumed. |
-| Control mode | Laptop-webcam gestures or PS4/PS5 controller; only the selected mode commands movement. |
+| Control mode | Laptop-webcam gestures or PS4 DualShock 4 controller; only the selected mode commands movement. |
 | Retention period | Configurable lifetime of an object record and its related data, measured from registration; default seven days. |
 
 A stopped robot does not necessarily mean an ended session. Match review, Pause, and recoverable failures pause the session. Stop and confirmation end it. Rejection leaves the object Lost and the session Paused.
@@ -61,7 +61,7 @@ Acceptance: the active target is identified; another target/session cannot run c
 
 Acceptance: the operator can see the robot feed, target, active mode, session state, and match results. Connection indicators distinguish available and unavailable required connections.
 
-**FR-4 — Provide exclusive control modes.** Support gestures and PS4/PS5 controller input for forward, backward, left, right, and stop. Select the mode before starting; lock it until the session ends.
+**FR-4 — Provide exclusive control modes.** Support gestures and the PS4 DualShock 4 controller for forward, backward, left, right, and stop. Select the mode before starting; lock it until the session ends. PS5 controller support is removed with supervisor approval recorded on 2026-11-06.
 
 Acceptance: demonstrate every action in each mode. The inactive mode cannot command movement. Pause does not unlock mode selection.
 
@@ -123,11 +123,17 @@ Acceptance: there is no login gate; searches/history work offline. Normal operat
 
 Acceptance: reconnection alone never restarts movement. Resume cannot bypass an unresolved failure. Previously held input must be released and applied again before the wheels restart.
 
+### 4.6 Proximity warning
+
+**FR-18 — Show an obstacle proximity warning.** During Searching, use the HC-SR04 to show a silent on-screen warning when an obstacle is within a calibrated warning distance. The warning is advisory only: it does not stop, pause, or steer the robot. Clear it after the sensor consistently reports a clear path.
+
+Acceptance: the warning distance and clear condition are set through controlled testing before movement qualification; no arbitrary distance is assumed. Sensor data or warning faults never masquerade as a confirmed clear path.
+
 ## 5. Cross-cutting requirements
 
 | ID | Requirement | Verification |
 | --- | --- | --- |
-| NFR-1 | Complete searching, including AI, works without internet after setup; local Wi-Fi is available. | Disconnect internet and complete registration, both control modes, match review, and history access. |
+| NFR-1 | Complete searching, including AI, works without internet after setup; local Wi-Fi is available. | Disconnect internet and complete registration, gesture and PS4 control, match review, and history access. |
 | NFR-2 | Preferred wireless operation or permitted wired demonstration still supports a fixed-desk operator and connected-room robot operation. | Qualify commands/video on the agreed room-to-room route. |
 | NFR-3 | Support Windows on the team's laptop with a dedicated NVIDIA GPU. | Record exact laptop/GPU specifications; qualify on that laptop. |
 | NFR-4 | Persist local records/evidence until registration-based retention expires; default seven days. | Restart and expiry checks under FR-13/FR-15. |
@@ -138,39 +144,44 @@ Acceptance: reconnection alone never restarts movement. Resume cannot bypass an 
 
 ### In scope
 
-Four-wheel manual movement; webcam gestures; PS4/PS5 control; live robot video; reference-image target selection; similarity alerts/bounding boxes; screenshot review; confirmation/rejection; session controls; emergency stop/failure recovery; local searchable history; configurable retention; offline runtime.
+Four-wheel manual movement; laptop-webcam gestures; PS4 DualShock 4 control; live robot video; HC-SR04 proximity warning; reference-image target selection; similarity alerts/bounding boxes; screenshot review; confirmation/rejection; session controls; emergency stop/failure recovery; local searchable history; configurable retention; offline runtime.
 
 ### Non-goals
 
-- Autonomous navigation, obstacle detection/avoidance, ultrasonic functions, servo functions, GPS, and room mapping.
+- Autonomous navigation, obstacle avoidance/steering, servo functions, GPS, and room mapping. The HC-SR04 is limited to the advisory warning in FR-18.
 - Object pickup/retrieval and guaranteed unique-belonging recognition.
 - Concurrent operators, robots, or targets; changing control mode within a session.
 - Public/social sharing, cloud accounts, and operating systems beyond Windows.
 
 ### Schedule and procurement
 
-As of 2026-11-05, the demonstration is expected in three to six weeks; the exact assessment date is pending. No hardware has been purchased. Only the doctor-prescribed components below may be purchased. Additional components require a separately authorized change to scope/procurement.
+As of 2026-11-06, Alisa reports a four-week completion window and that the hardware below has been purchased. Use 2026-12-04 as the planning target if the window starts today; the exact assessment date is not confirmed. The final deliverable is a project result demonstrated through manual testing in front of the supervisor. If the T2 review finds the purchased power parts unsuitable, any replacement or additional component requires supervisor approval before procurement.
 
 | Prescribed component | Quantity |
 | --- | ---: |
-| Robot Car Chassis Kit (4WD) | 1 |
-| L298N Motor Driver | 1 |
+| Two-layer MDF 4WD chassis with 65 mm wheels | 1 kit |
+| DC geared motors, dual shaft, 3–12 VDC, up to 450 RPM | 4 (assumed same model) |
+| L298 motor driver module | 1 |
 | Arduino Uno R3 | 1 |
-| ESP32-CAM OV2640 | 1 |
-| HC-05 Bluetooth Module | 1 |
-| 18650 Rechargeable Batteries | 2–3 |
-| Battery Holder | 1 |
-| Battery Charger | 1 |
-| Battery Protection Circuit (BMS) | 1 |
-| 5V Voltage Regulator (DC-DC) | 1 |
-| Power Switch | 1 |
+| ESP32-CAM OV2640 with CH340 | 1 |
+| HC-05 Bluetooth module | 1 |
+| HC-SR04 ultrasonic sensor and holder | 1 each |
+| 18650 rechargeable cells, 1200 mAh | 6 (3 active, 3 spare) |
+| 3-cell 18650 holder | 1 |
+| TG-008 two-bay 18650 charger | 1 |
+| Single-bay 18650 charger, model/output not yet recorded | 1 |
+| 3S 10 A BMS | 1 |
+| 7805 5 V regulator, listing marked 100 mA | 1 |
+| 20 mm, 3-pin rocker switch | 1 |
 | Breadboard 400 Points | 1 |
 | Male-to-Male Jumper Wires | 20–30 |
 | Male-to-Female Jumper Wires | 15–20 |
 | Female-to-Female Jumper Wires | 10 |
-| Micro USB Cable | 1 |
+| USB cable | 1 |
+| Resistors, 220 Ω and 1,000 Ω, 1/4 W | 5 each |
+| Additional resistors, 0.22 Ω and 1 Ω, 0.25 W | Purchased as extras; quantities and use unassigned |
 
-The laptop, its webcam, and controller are supporting dependencies; confirm their exact specifications/availability before qualification. Technical proposals and unverified hardware design details belong in the addendum.
+The laptop's built-in camera is used for gesture input; ESP32-CAM provides robot video. The controller is a PS4 DualShock 4 (CUH-ZCT1 or CUH-ZCT2; confirm the exact unit). The supervisor-approved PS4-only scope change removes PS5 support. Hardware photos identify the listed modules but do not establish the electrical safety or compatibility of the assembled system.
 
 ## 7. Success metrics and acceptance protocol
 
@@ -190,20 +201,25 @@ For SM-2, test every direction in both modes, emergency stop in both modes, acti
 
 The room-to-room demonstration must keep the operator at the fixed desk, maintain video/control along the route, and search in more than one room. A same-room demonstration alone does not establish NFR-2. Record route dimensions and connection arrangement before qualification.
 
+Verify FR-18 during controlled integration: the warning is visible, silent, self-clearing after the calibrated clear condition, and never changes movement/session state. Record the warning and clear thresholds.
+
 ## 8. Dependencies, risks, and deferred decisions
 
 | Item | Owner and revisit condition | Effect |
 | --- | --- | --- |
-| Exact assessment date/delivery plan | Team; confirm with doctor before scheduling integration. | Requirements review can proceed; delivery commitment is provisional. |
-| Exact laptop/GPU, Windows version, webcam, controller model/availability | Team; establish before qualification. | Support/performance remain unqualified until measured. |
-| Purchased variants, battery quantity/configuration, wiring, communication arrangement | Team with doctor; resolve during architecture before procurement/assembly. | No compatibility, power design, or coverage is asserted here. |
-| Fixed-desk multi-room coverage, 0.5-second stops/video, twenty-minute endurance | Team; conduct early integration trials. | If unmet, record failures and obtain an explicit revision; do not silently narrow scope. |
+| Exact assessment date and any additional submission instructions | Team; confirm with supervisor. | Four-week planning window and supervised manual demonstration are recorded; calendar assessment date remains pending. |
+| Exact laptop/GPU/Windows and controller unit | Team; establish before qualification. | LOQ 15IRH8, Windows 11 Pro, RTX 4050, 16 GB RAM and PS4 DualShock 4 are reported; support/performance remain unqualified until measured. |
+| Battery charging and power distribution | Hardware team with supervisor; T2 before energizing. | Select removable-cell charging: remove all active cells from the holder; charge two in the TG-008 and the third in the single-bay charger only after both chargers' per-bay specifications are confirmed compatible with the actual cell chemistry and permitted charging current. Neither charger connects to the assembled 3S pack. Keep matched active/spare cell sets identified and verify the holder's cell-junction access for the BMS. The pictured 7805 is listed at 100 mA, replacing the planned DC-DC regulator; load suitability is unresolved. |
+| Motor/driver compatibility and wiring | Hardware team with supervisor; T2 before energizing. | Four motors are assumed to be the same 3–12 V, 450 RPM model. Select one L298 channel for the left pair and the other for the right pair, conditional on combined startup/stall current and thermal verification. Use a reviewed logic-level/grounding/reset plan and current-rated motor/power connections; stall/start current and compatibility remain unverified. |
+| Fixed-desk two-room coverage, 0.5-second stops/video, twenty-minute endurance | Team; conduct controlled integration trials. | Two adjacent rooms and local Wi-Fi are reported; coverage and performance remain unqualified. |
+| Obstacle-warning distance and clear threshold | Hardware/input team; determine in controlled tests before movement qualification. | Mount the HC-SR04 facing forward. Use separate warning and clearing distances to prevent flicker, calibrated at the selected indoor speed. Keep the warning silent, visual and advisory; invalid readings are unavailable, not clear. No distance is chosen from the photos. |
 | Five objects, references, route, lighting/placements | Team with doctor; freeze before qualification. | Defines the conditions where detection results apply. |
-| Gesture/controller mappings, image-format limits, UI details, matching settings | Team; specify in UX/architecture before functional testing. | Must meet the stated actions/targets; these are design details, not omitted features. |
-| AI unavailability, application interruption, and unreviewed screenshot/history outcomes when Stop ends review | Team; agree session/history outcomes before implementation. | Preserve the stated movement-stop/recovery rules and explicit human confirmation; specify remaining outcomes rather than treating them as decided. |
+| Input calibration, actual controller profile, UI layout and matching settings | Team; measure/verify before functional testing. | Direction/button mappings and image-format limits are already adopted in the architecture/TRD; remaining thresholds and equipment behavior need qualification. |
 
-Unconfirmed architecture choices are not approved requirements. Software suggestions remain in the addendum. Resolve deferred details at the stated gates; they are not acceptance passes or authorization to buy extra components.
+AI failure, backend restart and unreviewed Stop outcomes are resolved by AD-6/TRD section 5; they are not deferred product decisions. Robotics-lab visual direction and the proposed accessibility targets were accepted during the 2026-11-06 interview; detailed visual choices and implemented accessibility evidence remain pending.
+
+The hardware inventory and product behavior above were updated from Alisa's 2026-11-06 decisions and photos. T2 remains open: those photos do not approve a charging arrangement, a regulator load, or the motor/driver current margin. Software suggestions remain in the addendum. Resolve deferred details at the stated gates; they are not acceptance passes or authorization to buy extra components.
 
 ## 9. Approval
 
-Approved by Alisa on 2026-11-05 as version 1.0, including the documented follow-up items. This approval establishes the product requirements baseline with explicit qualification gates; hardware performance remains unverified. The approved document is saved as `docs/PRD.md`.
+Version 1.0 was approved by Alisa on 2026-11-05. Version 1.1 records Alisa's 2026-11-06 scope and inventory decisions: PS4-only controller support (supervisor-approved), the purchased hardware, and the advisory HC-SR04 warning. This amendment does not close T2 or establish measured performance. The exact power/charging plan and warning threshold remain gated as described above.
